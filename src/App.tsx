@@ -5,25 +5,34 @@ import { generateClient } from "aws-amplify/data";
 const client = generateClient<Schema>();
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [token, setToken] = useState<Schema["Token"]["type"][]>([]);
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+    const sub = client.models.Token.observeQuery().subscribe({
+      next: ({ items }) => {
+        setToken([...items]);
+      },
     });
+
+    return () => sub.unsubscribe();
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
+  const createToken = async () => {
+    await client.models.Token.create({
+        requestId: "06a2cae3-8aed-475d-98f2-ea30c2c8d00c",
+        ppid: "215445-000027",
+        count: 100,
+        requestTime: Date()
+    });
+  };
 
   return (
     <main>
       <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
+      <button onClick={createToken}>+ new</button>
       <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+        {token.map((tok) => (
+          <li key={tok.id}>{tok.requestId} {tok.ppid}</li>
         ))}
       </ul>
       <div>
