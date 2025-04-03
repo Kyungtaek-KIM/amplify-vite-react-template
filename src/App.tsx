@@ -22,7 +22,7 @@ function App() {
       count: 10,
       RequestTime: new Date().toISOString()
     })
-    const { data: items, errors } = await client.models.TokenRequest.list()
+    const { data: items } = await client.models.TokenRequest.list()
 
     setTokenRequest(items)
   }
