@@ -5,45 +5,40 @@ import { generateClient } from "aws-amplify/data";
 const client = generateClient<Schema>();
 
 function App() {
-  const [token, setToken] = useState<Schema["Token"]["type"][]>([]);
+  const [tokenRequest, setTokenRequest] = useState<Schema["TokenRequest"]["type"][]>([]);
+  
+  const fetchTokeRequest = async () => {
+    const { data: items, errors } = await client.models.TokenRequest.list()
+    setTokenRequest(items)
+    console.log(errors)
+    console.log(items)
+  }
 
-  useEffect(() => {
-    const sub = client.models.Token.observeQuery().subscribe({
-      next: ({ items }) => {
-        setToken([...items]);
-      },
-    });
+  const addTokenRequest =  async() => {
+    console.log("creating")
+    await client.models.TokenRequest.create({
+      requestId: "06a2cae3-8aed-475d-18f2-ea30c2c8d00d",
+      ppid: "215445-000027",
+      count: 10,
+      requestTime: new Date().toISOString()
+    })
+    const { data: items, errors } = await client.models.TokenRequest.list()
 
-    return () => sub.unsubscribe();
-  }, []);
-
-  const createToken = async () => {
-    await client.models.Token.create({
-        requestId: "06a2cae3-8aed-475d-98f2-ea30c2c8d00c",
-        ppid: "215445-000027",
-        count: 100,
-        requestTime: Date()
-    });
-  };
+    setTokenRequest(items)
+  }
 
   return (
     <main>
-      <h1>My todos</h1>
-      <button onClick={createToken}>+ new</button>
+      <h1>FindMyManufacturing API</h1>
+      <button onClick={fetchTokeRequest}>GetTokenRequest</button>
       <ul>
-        {token.map((tok) => (
-          <li key={tok.id}>{tok.requestId} {tok.ppid}</li>
+        {tokenRequest.map((tokenReq, index) => (
+          <li key={index}>{tokenReq.RequestId}</li>
         ))}
       </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
+      <button onClick={addTokenRequest}>Test creating Token</button>
     </main>
-  );
+  )
 }
 
 export default App;
