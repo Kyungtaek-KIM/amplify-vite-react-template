@@ -10,8 +10,10 @@ function App() {
   const fetchTokeRequest = async () => {
     const { data: items, errors } = await client.models.TokenRequest.list()
     setTokenRequest(items)
-    console.log(errors)
-    console.log(items)
+    if (errors != undefined)
+    {
+      console.log(errors)
+    }
   }
 
   const addTokenRequest =  async() => {
@@ -22,8 +24,12 @@ function App() {
       count: 10,
       RequestTime: new Date().toISOString()
     })
-    const { data: items } = await client.models.TokenRequest.list()
 
+    const { data: items, errors } = await client.models.TokenRequest.list()
+    if (errors != undefined)
+    {
+      console.log(errors)
+    }
     setTokenRequest(items)
   }
 
