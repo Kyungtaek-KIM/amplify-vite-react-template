@@ -17,10 +17,10 @@ function App() {
   const addTokenRequest =  async() => {
     console.log("creating")
     await client.models.TokenRequest.create({
-      requestId: "06a2cae3-8aed-475d-18f2-ea30c2c8d00d",
+      RequestId: "06a2cae3-8aed-475d-18f2-ea30c2c8d00d",
       ppid: "215445-000027",
       count: 10,
-      requestTime: new Date().toISOString()
+      RequestTime: new Date().toISOString()
     })
     const { data: items, errors } = await client.models.TokenRequest.list()
 
