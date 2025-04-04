@@ -1,50 +1,56 @@
-import { useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-
-const client = generateClient<Schema>();
+import { useState } from "react"
+import { get } from 'aws-amplify/api'
 
 function App() {
-  const [tokenRequest, setTokenRequest] = useState<Schema["TokenRequest"]["type"][]>([]);
+  // const [tokenCount, setTokenCount] = useState<number>(0)
+  const [tokenRequestItems, setTokenRequestItems] = useState<string | undefined>("")
   
-  const fetchTokeRequest = async () => {
-    const { data: items, errors } = await client.models.TokenRequest.list()
-    setTokenRequest(items)
-    if (errors != undefined)
-    {
-      console.log(errors)
-    }
-  }
 
-  const addTokenRequest =  async() => {
-    console.log("creating")
-    await client.models.TokenRequest.create({
-      RequestId: "06a2cae3-8aed-475d-18f2-ea30c2c8d00d",
-      ppid: "215445-000027",
-      count: 10,
-      RequestTime: new Date().toISOString()
-    })
+  // const addTokenRequest =  async(nbToken: number) => {
+  //   // TODO: Request token from lambda
+  //   // Get Request ID and add it to RDS
+  //   await client.models.TokenRequest.create({
+  //     RequestId: "06a2cae3-8aed-475d-18f2-ea30c2c8d11d",
+  //     ppid: "215445-000027",
+  //     count: nbToken,
+  //     RequestTime: new Date().toISOString()
+  //   })
 
-    const { data: items, errors } = await client.models.TokenRequest.list()
-    if (errors != undefined)
-    {
-      console.log(errors)
+  //   const { data: items, errors } = await client.models.TokenRequest.list()
+  //   if (errors != undefined)
+  //   {
+  //     console.log(errors)
+  //   }
+  //   setTokenRequest(items)
+  // }
+
+  async function getItem() {
+    try {
+      const restOperation = get({ 
+          apiName: 'find-my-api',
+          path: 'token_request'
+      })
+      const response = await restOperation.response
+      const json = await response.body.text()
+      console.log(json)
+      setTokenRequestItems(json)
+
+    } catch (error) {
+      console.log(error)
     }
-    setTokenRequest(items)
   }
 
   return (
     <main>
       <h1>FindMyManufacturing API</h1>
-      <button onClick={fetchTokeRequest}>GetTokenRequest</button>
-      <ul>
-        {tokenRequest.map((tokenReq, index) => (
-          <li key={index}>{tokenReq.RequestId}</li>
-        ))}
-      </ul>
-      <button onClick={addTokenRequest}>Test creating Token</button>
+      <button onClick={getItem}>GetTokenRequest</button>
+      <div>
+        {tokenRequestItems}
+      </div>
+      {/* <input value={tokenCount} onChange={evt => setTokenCount(Number(evt.target.value))}/> */}
+      {/* <button onClick={() => addTokenRequest(tokenCount)}>Test creating Token</button> */}
     </main>
   )
 }
 
-export default App;
+export default App
